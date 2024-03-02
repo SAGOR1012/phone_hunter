@@ -1,4 +1,4 @@
-const loadPhone = async (searchText) => {
+const loadPhone = async (searchText = "samsung") => {
   const res = await fetch(
     `https://openapi.programming-hero.com/api/phones?search=${searchText}`
   );
@@ -17,7 +17,8 @@ const displayPhones = (phones) => {
   } else {
     showAllContainer.classList.add("hidden");
   }
-  phones = phones.slice(0, 5);
+  /* Display only first 12 phones */
+  phones = phones.slice(0, 12);
   /* 1 Find id  */
   const phoneContainer = document.getElementById("phone_container");
 
@@ -37,8 +38,8 @@ const displayPhones = (phones) => {
     <div class="card-body">
         <h2 class="card-title">${phone.phone_name}</h2>
         <p>If a dog chews shoes whose shoes does he choose?</p>
-        <div class="card-actions justify-end">
-            <button class="btn btn-primary">Buy Now</button>
+        <div class="card-actions justify-center">
+            <button onclick="handelShowDetails('${phone.slug}')" class="btn btn-primary">Show Details</button>
         </div>
     </div>
     `;
@@ -68,4 +69,52 @@ const toggleLoadingSpinner = (isloading) => {
   }
 };
 
+const handelShowDetails = async (id) => {
+  console.log("clicked show details", id);
+  const res = await fetch(
+    `https://openapi.programming-hero.com/api/phone/${id}`
+  );
+  const data = await res.json();
+  // console.log(data);
+  const phone = data.data;
+  showPhoneDetails(phone);
+};
+
+const showPhoneDetails = (phone) => {
+  console.log(phone);
+  const phoneName = document.getElementById("show_details_phone_name");
+  phoneName.innerText = phone.name;
+
+  const showDetails_container = document.getElementById(
+    "show_details_container"
+  );
+  showDetails_container.innerHTML = `
+  <img class="flex justify-center mx-auto mt-5" src="${phone.image}"  alt="">
+  <p class="text-base mt-2"><span><span class ="font-bold">Storage:</span> ${
+    phone?.mainFeatures?.storage
+  }</span></p>
+  <p class="text-base mt-2"><span><span class ="font-bold">Display Size:</span> ${
+    phone?.mainFeatures?.displaySize
+  }</span></p>
+  <p class="text-base mt-2 "><span><span class ="font-bold">Memory :</span> ${
+    phone?.mainFeatures?.memory
+  }</span></p>
+  <p class="text-base mt-2 w-auto"><span><span class ="font-bold">Sensore :</span> ${
+    phone?.mainFeatures?.sensors
+  }</span></p>
+  <p class="text-base mt-2 w-auto"><span><span class ="font-bold">GPS :</span> ${
+    phone?.others?.GPS || "No GPS"
+  }</span></p>
+  <p class="text-base mt-2 w-auto"><span><span class ="font-bold">Release Date :</span> ${
+    phone?.releaseDate
+  }</span></p>
+  `;
+  /* show the modal */
+  show_details_modal.showModal();
+};
+/*  */
+/* Handel show all */
+/* const handelShowAll = () => {
+  handelSearch();
+}; */
 loadPhone();
